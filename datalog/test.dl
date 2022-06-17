@@ -1,0 +1,84 @@
+#include "lib/vandal.dl"
+
+
+.type Block
+.type Function
+// INPUT
+/*
+.decl edge(h:Statement, t:Statement)                // There is a CFG edge from h to t
+.input edge
+.decl def(var:Variable, stmt:Statement)             // var is defined by stmt
+.input def
+.decl use(var:Variable, stmt:Statement, i:number)   // var is used by stmt as argument i
+.input use
+.decl op(stmt:Statement, op:Opcode)                 // stmt's opcode is op
+.input op
+.decl value(var:Variable, val:Value)                // A variable's possible value set if known
+.input value
+*/
+.decl isBlock(b: Block)
+.decl block(s: Statement, b: Block)
+.input block
+
+/* fcorleone's code */
+
+//.decl BackdoorArbitrayTransfer(transfer: Statement)
+//.output BackdoorArbitrayTransfer
+
+/* **** Declare a Dynamic Load **** */
+/*
+// Declare a dynamic load
+.decl DynamicLoad(var: Variable)
+DynamicLoad(var) :-
+	RuntimeKnowable(op),
+	op(stmt,op),
+	def(var,stmt).
+DynamicLoad(var) :-
+	SLOAD(_,_,var).
+*/
+
+/* **** Declare a statement with three parameters **** */
+
+// Declare a statement with three arguments
+.decl Args3(stmt: Statement, op1:Variable, op2: Variable, op3:Variable)
+Args3(stmt,op1,op2,op3) :-
+	op(stmt,opcode),
+	ternArith(opcode),
+	use(op1,stmt,_),
+	use(op2,stmt,_),
+	use(op3,stmt,_).
+
+/* **** Declare a transfer function **** */
+// Declare a transfer
+.decl Transfer(stmt: Statement)
+
+// For now, we only consider trasfer function as a function with three parameters.
+Transfer(stmt) :-
+	Args3(stmt,from_,to_,amount).
+	//manipulableAddress(from_),
+	//manipulableAddress(to_).
+
+/* **** Declare an onlyOwner **** */
+// Declare an onlyOwner
+.decl OnlyOwner(stmt: Statement)
+.output OnlyOwner
+
+OnlyOwner(stmt) :-
+	op(stmt,"CALLER"),ls
+	
+	block(stmt,b),
+	op(stmt_,"EQ"),
+	block(stmt_,b).
+
+/* **** Declare an Approve statement **** */
+// Declare an Approve statement
+.declare Approve(stmt: Statement)
+.output Approve
+
+Approve()
+
+
+
+
+
+
